@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web OS</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.2/css/all.css">
+</head>
+
+<body>
+    <section id="loading">
+
+    </section>
+    <section id="desktop">
+        <div id="topbar">
+            <span id="os-name">MohaOS (WebOS)</span>
+            <span id="time">Loading Time...</span>
+        </div>
+        <div id="apps">
+            <div class="app" onclick="clickApp(this, 'This PC');">
+                <div class="icon" style="--iconURL: url('/icons/desktop-pc.png');"></div>
+                <span class="name">This PC</span>
+            </div>
+        </div>
+        <div id="selection-box"></div>
+    </section>
+    <section id="apps-widgets">
+        
+    </section>
+
+    <script src="./selectionBox.js"></script>
+    <script src="./scripts.js"></script>
+</body>
+
+</html>

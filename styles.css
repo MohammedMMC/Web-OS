@@ -1,0 +1,125 @@
+:root {
+  --text: #fff;
+  --appbar: #fff;
+  --red: #d65050;
+  --green: #50d678;
+  --blue: #50a3d6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-image: url("./wallpapers/1344443.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: var(--text);
+  /*  */
+  position: relative;
+  user-select: none;
+  font-family: "Courier New", Courier, monospace;
+}
+
+#desktop {
+  height: 100vh;
+  width: 100vw;
+}
+
+#desktop #apps {
+  padding-top: 1.2cm;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+#desktop #apps > * {
+  overflow: hidden;
+}
+
+#desktop .app {
+  height: calc(100% - 10px);
+  width: calc(100% - 10px);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  z-index: 1000;
+}
+
+#desktop .app.clickedOnce {
+  border: 1px solid var(--blue);
+  background-color: #0000ff33;
+}
+
+#desktop .app .icon {
+  width: 100%; 
+  height: 60%;
+  background-image: var(--iconURL);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center; 
+}
+
+#desktop .app .name {
+  font-size: calc(((100vw / 12) - (12 * 5px)) / 4 + 8px);
+  font-weight: 900;
+}
+
+#desktop #topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #5c5c5c85;
+  backdrop-filter: blur(10px);
+  width: 100vw;
+  height: 1.2cm;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #c7c7c75c;
+}
+
+#desktop #topbar span {
+  background-color: #c7c7c75c;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+#selection-box {
+  position: absolute;
+  border: 1px solid var(--blue);
+  background-color: #0000ff33;
+  display: none;
+  z-index: 100;
+}
+
+#apps-widgets .app-widget {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-45%, -45%);
+  z-index: 10000;
+  width: 45%;
+  height: 45%;
+  border-radius: 10px;
+  background-color: #5c5c5c85;
+  backdrop-filter: blur(10px);
+  border: 2px solid #c7c7c75c;
+}
