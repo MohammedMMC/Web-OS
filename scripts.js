@@ -1,4 +1,5 @@
 const appsWidgets = document.getElementById('apps-widgets');
+const appsContainer = document.getElementById('apps');
 
 const APP_ICONS = [
     "3d-printer.png",
@@ -47,10 +48,30 @@ const APP_ICONS = [
     "washing-machine.png",
     "wifi-router.png"
 ];
+let APPS_SCRIPTS = new Map();
 
 setInterval(() => {
     document.getElementById("time").textContent = `${(new Date()).toLocaleDateString()}, ${(new Date()).toLocaleTimeString()}`;
 }, 1000);
+
+function setCookie(name, value, days) {
+    const expires = new Date(Date.now() + (days ?? 60 * 12) * 864e5).toUTCString();
+    document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+}
+function getCookie(name) {
+    return document.cookie.split('; ').find(row => row.startsWith(name + '='))?.split('=')[1];
+}
+function deleteCookie(name) {
+    setCookie(name, '', -1);
+}
+function getCookieJSON(name) {
+    return JSON.parse(getCookie(name) ?? JSON.stringify({}));
+}
+
+function setCookieJSON(name, data) {
+    return setCookie(name, JSON.stringify(data));
+}
+
 
 const { userAgent, platform, language, appVersion } = navigator;
 const os = platform.includes('Win') ? 'Windows' : platform.includes('Mac') ? 'macOS' :
@@ -74,7 +95,7 @@ const READY_APPS = {
             <p class="appscreator-subtitles">Select an icon:</p>
             <div class="appscreator-selecticon">
                 ${APP_ICONS.map(icon => `
-                <div onclick="appscreator_selecticon(this)" style="--iconURL: url('/icons/${icon}');"></div>
+                <div onclick="appscreator_selecticon(this, '${icon}')" data-image="${icon}" style="--iconURL: url('/icons/${icon}');"></div>
                 `).join('')}
             </div>
             <p class="appscreator-subtitles">Enter Your App Name:</p>
@@ -83,13 +104,10 @@ const READY_APPS = {
             <p class="appscreator-subtitles">Enter Your App URL:</p>
             <input type="url" id="appscreator-input-appurl" />
 
-            <button>Create</button>
+            <p id="appscreator-message" style="display: none;"></p>
+
+            <button onclick="appscreator_createapp()">Create</button>
         </div>
-        <script>${`
-            function appscreator_selecticon(div) {
-                
-            }
-        `}</script>
         <style>${`
             #appscreator-creator {
                 display: flex;
@@ -113,6 +131,12 @@ const READY_APPS = {
                 font-size: large;
                 margin-top: 5px;
             }
+            #appscreator-message {
+                font-weight: bold;
+                font-size: large;
+                margin-top: 10px;
+                color: lime;
+            }
             .appscreator-selecticon {
                 width: 100%;
                 display: flex;
@@ -129,11 +153,57 @@ const READY_APPS = {
                 background-image: var(--iconURL);
                 background-position: center;
                 background-size: contain;
+                border-radius: 10px;
+            }
+            .appscreator-selecticon div.select {
+                background-color: #78b9e1ba;
+                border: 2px solid #78b9e1;
             }
         `}</style>
     `,
+    "Apps Creator-script": () => `
+        function appscreator_selecticon(div, icon) {
+            [...div.parentNode.children].forEach(n=>n.classList.remove("select"));
+            div.classList.add("select");
+        }
+        function appscreator_createapp() {
+            const appMessage = document.querySelector("#appscreator-message");
+            const appName = document.querySelector("#appscreator-input-appname").value;
+            const appURL = document.querySelector("#appscreator-input-appurl").value;
+            const appIcon = document.querySelector(".appscreator-selecticon").getAttribute("data-image");
+
+            let oldData = getCookieJSON("appscreator");
+            if (!oldData || !oldData?.apps) oldData = {"apps": []};
+
+            oldData.apps.push({
+                "name": appName,
+                "url": appURL,
+                "icon": appIcon
+            });
+
+            setCookieJSON("appscreator", oldData);
+
+            appMessage.style.display = "block";
+            appMessage.textContent = "App Created Successfully!";
+        }
+    `
 };
 
+function refreshDesktop() {
+    let appHTML = (name, icon) => `
+    <div class="app" data-appname="${name}" onclick="clickApp(this, '${name}');">
+        <div class="icon" style="--iconURL: url('${icon}');"></div>
+        <span class="name">${name}</span>
+    </div>
+    `;
+    const apps = getCookieJSON("appscreator")?.apps ?? [];
+    
+    apps?.forEach(app => {
+        if (![...appsContainer.children].map(a => a.getAttribute("data-appname")).includes(app.name)) {
+            appsContainer.insertAdjacentHTML('beforeend', appHTML(app.name, app.icon));
+        }
+    });
+}
 
 /**
  * @param {HTMLElement} el 
@@ -149,6 +219,10 @@ function clickApp(el, name) {
         closeAPP(name);
         setTimeout(() => {
             openAPP(name, READY_APPS[name]());
+            const script = document.createElement('script');
+            script.textContent = READY_APPS[name + "-script"]();
+            document.body.appendChild(script);
+            APPS_SCRIPTS.set(name, script);
         }, 250);
     }
 }
@@ -194,6 +268,8 @@ function openAPP(appName, appContent) {
         setTimeout(() => {
             appWidget.remove();
         }, 250);
+        APPS_SCRIPTS.get(appName)?.remove();
+        APPS_SCRIPTS.delete(appName);
     }
 
     const resizers = appWidget.querySelectorAll('.resizer');

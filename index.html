@@ -19,11 +19,11 @@
             <span id="time">Loading Time...</span>
         </div>
         <div id="apps">
-            <div class="app" onclick="clickApp(this, 'This PC');">
+            <div class="app" data-appname="This PC" onclick="clickApp(this, 'This PC');">
                 <div class="icon" style="--iconURL: url('/icons/desktop-pc.png');"></div>
                 <span class="name">This PC</span>
             </div>
-            <div class="app" onclick="clickApp(this, 'Apps Creator');">
+            <div class="app" data-appname="Apps Creator" onclick="clickApp(this, 'Apps Creator');">
                 <div class="icon" style="--iconURL: url('/icons/hammer-drill.png');"></div>
                 <span class="name">Apps Creator</span>
             </div>
