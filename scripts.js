@@ -1,5 +1,53 @@
 const appsWidgets = document.getElementById('apps-widgets');
 
+const APP_ICONS = [
+    "3d-printer.png",
+    "air-conditioner.png",
+    "body-scanner.png",
+    "cctv-camera.png",
+    "computer-tower.png",
+    "conveyor.png",
+    "creative-thinking.png",
+    "data-center.png",
+    "desktop-pc.png",
+    "digital-wallet.png",
+    "e-bike.png",
+    "earpods.png",
+    "electric-kettle.png",
+    "fax-machine.png",
+    "game-console.png",
+    "graphic-card.png",
+    "hammer-drill.png",
+    "jetpack.png",
+    "laptop.png",
+    "memory-card.png",
+    "microphone.png",
+    "microwave-oven.png",
+    "pen-tablet.png",
+    "power-bank.png",
+    "processor.png",
+    "projector.png",
+    "ram.png",
+    "robot-hand.png",
+    "robot-vacuum-cleaner.png",
+    "robot.png",
+    "sata.png",
+    "sim-card.png",
+    "smart-drone.png",
+    "smart-energy.png",
+    "smart-glasses.png",
+    "smart-home.png",
+    "smart-refrigerator.png",
+    "smartwatch.png",
+    "solar-panel.png",
+    "space-satellite.png",
+    "speaker-box.png",
+    "traffic-light.png",
+    "usb-drive.png",
+    "washing-machine.png",
+    "wifi-router.png"
+];
+
 setInterval(() => {
     document.getElementById("time").textContent = `${(new Date()).toLocaleDateString()}, ${(new Date()).toLocaleTimeString()}`;
 }, 1000);
@@ -9,8 +57,8 @@ const os = platform.includes('Win') ? 'Windows' : platform.includes('Mac') ? 'ma
     platform.includes('Linux') ? 'Linux' : platform.includes('Android') ? 'Android' :
         platform.includes('iPhone') || platform.includes('iPad') ? 'iOS' : 'Unknown';
 
-        // <li>User Agent: ${userAgent}</li>
-        // <li>App Version: ${appVersion}</li>
+// <li>User Agent: ${userAgent}</li>
+// <li>App Version: ${appVersion}</li>
 const READY_APPS = {
     "This PC": () => `
         <h3>Pc Informations</h3>
@@ -19,6 +67,70 @@ const READY_APPS = {
             <li>Platform: <span class="primary">${platform}</span></li>
             <li>Language: <span class="primary">${language}</span></li>
         </ul>
+    `,
+    "Apps Creator": () => `
+        <h3>Create Your APP!</h3>
+        <div id="appscreator-creator">
+            <p class="appscreator-subtitles">Select an icon:</p>
+            <div class="appscreator-selecticon">
+                ${APP_ICONS.map(icon => `
+                <div onclick="appscreator_selecticon(this)" style="--iconURL: url('/icons/${icon}');"></div>
+                `).join('')}
+            </div>
+            <p class="appscreator-subtitles">Enter Your App Name:</p>
+            <input type="text" id="appscreator-input-appname" />
+
+            <p class="appscreator-subtitles">Enter Your App URL:</p>
+            <input type="url" id="appscreator-input-appurl" />
+
+            <button>Create</button>
+        </div>
+        <script>${`
+            function appscreator_selecticon(div) {
+                
+            }
+        `}</script>
+        <style>${`
+            #appscreator-creator {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            #appscreator-creator input {
+                padding: 10px;
+                border-radius: 10px;
+            }
+            #appscreator-creator button {
+                padding: 10px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: large;
+                cursor: pointer;
+            }
+            .appscreator-subtitles {
+                font-weight: bold;
+                font-size: large;
+                margin-top: 5px;
+            }
+            .appscreator-selecticon {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                overflow-y: scroll;
+                height: 115px;
+            }
+            .appscreator-selecticon div {
+                --size: 50px;
+                width: var(--size);
+                height: var(--size);
+                background-image: var(--iconURL);
+                background-position: center;
+                background-size: contain;
+            }
+        `}</style>
     `,
 };
 

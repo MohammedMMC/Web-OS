@@ -53,6 +53,7 @@ span.primary {
   justify-items: center;
   align-content: center;
   justify-content: center;
+  grid-auto-flow: column;
 }
 
 #desktop #apps > * {
@@ -88,6 +89,7 @@ span.primary {
 #desktop .app .name {
   font-size: calc(((100vw / 12) - (12 * 5px)) / 4 + 8px);
   font-weight: 900;
+  text-align: center;
 }
 
 #desktop #topbar {
@@ -139,6 +141,8 @@ span.primary {
 #apps-widgets .app-widget .app-content {
   padding: 10px;
   user-select: text !important;
+  height: calc(100% - 45px);
+  overflow-y: auto;
 }
 
 #apps-widgets .app-widget.closing {
