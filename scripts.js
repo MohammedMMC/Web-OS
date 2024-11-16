@@ -2,6 +2,7 @@ const appsWidgets = document.getElementById('apps-widgets');
 const appsContainer = document.getElementById('apps');
 
 const APP_ICONS = [
+    "google.png",
     "3d-printer.png",
     "air-conditioner.png",
     "body-scanner.png",
@@ -48,6 +49,7 @@ const APP_ICONS = [
     "washing-machine.png",
     "wifi-router.png"
 ];
+const WALLPAPERS_COUNT = 11; // 0 -> 11
 let APPS_SCRIPTS = new Map();
 
 setInterval(() => {
@@ -161,6 +163,59 @@ const READY_APPS = {
             }
         `}</style>
     `,
+    "Wallpaper": () => `
+        <h3>Select a Wallpaper:</h3>
+        <div class="wallpaper-select">
+            ${Array.from({ length: WALLPAPERS_COUNT }, (_, index) => `
+            <div onclick="wallpaper_select(this)" data-image="${index}.png" style="--imageURL: url('/wallpapers/${index}.png');"></div>
+            `).join('')}
+        </div>
+        <button onclick="wallpaper_set()">Set</button>
+        <style>${`
+            .wallpaper-select ~ button {
+                padding: 10px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: large;
+                cursor: pointer;
+                width: 100%;
+                margin-top: 15px;
+            }
+            .wallpaper-select {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                overflow-y: scroll;
+                height: 220px;
+            }
+            .wallpaper-select div {
+                width: 130px;
+                height: 100px;
+                background-image: var(--imageURL);
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: contain;
+                border-radius: 20px;
+            }
+            .wallpaper-select div.select {
+                background-color: #78b9e1ba;
+                border: 2px solid #78b9e1;
+            }
+        `}</style>
+    `,
+    "Wallpaper-script": () => `
+        function wallpaper_select(div, image) {
+            [...div.parentNode.children].forEach(n=>n.classList.remove("select"));
+            div.classList.add("select");
+        }
+        function wallpaper_set() {
+            const wallpaperImage = document.querySelector(".wallpaper-select .select").getAttribute("data-image");
+            setCookie('wallpaper', wallpaperImage);
+            refreshWallpaper();
+        }
+    `,
     "Apps Creator-script": () => `
         function appscreator_selecticon(div, icon) {
             [...div.parentNode.children].forEach(n=>n.classList.remove("select"));
@@ -170,9 +225,9 @@ const READY_APPS = {
             const appMessage = document.querySelector("#appscreator-message");
             const appName = document.querySelector("#appscreator-input-appname").value;
             const appURL = document.querySelector("#appscreator-input-appurl").value;
-            const appIcon = document.querySelector(".appscreator-selecticon").getAttribute("data-image");
-
-            let oldData = getCookieJSON("appscreator");
+            const appIcon = document.querySelector(".appscreator-selecticon .select").getAttribute("data-image");
+            
+            let oldData = getCookieJSON("apps");
             if (!oldData || !oldData?.apps) oldData = {"apps": []};
 
             oldData.apps.push({
@@ -181,23 +236,76 @@ const READY_APPS = {
                 "icon": appIcon
             });
 
-            setCookieJSON("appscreator", oldData);
+            setCookieJSON("apps", oldData);
 
             appMessage.style.display = "block";
             appMessage.textContent = "App Created Successfully!";
+            refreshDesktop();
         }
-    `
+    `,
+    "Apps Manager": () => `
+        <h3>Your Apps</h3>
+        <div id="appsmanager-yourapps">
+                ${(getCookieJSON("apps")?.apps ?? []).map((app, i) => `
+                    <div class="appsmanager-app">
+                        <img src="/icons/${app.icon}" width="50" height="50" />
+                        <span>${app.name}</span>
+                        <button onclick="appsmanager_deleteapp(this.parentNode, ${i});">Delete</button>
+                    </div>
+                `).join('')}
+        </div>
+        <style>${`
+            #appsmanager-yourapps {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            #appsmanager-yourapps .appsmanager-app {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                gap: 20px;
+            }
+            #appsmanager-yourapps .appsmanager-app button {
+                padding: 10px;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: medium;
+                letter-spacing: 1px;
+            }
+        `}</style>
+    `,
+    "Apps Manager-script": () => `
+        function appsmanager_deleteapp(div, appIndex) {
+            [...div.children].map(el=>el.remove());
+            div.innerHTML = "<span>Deleted!</span>";
+            let apps = (getCookieJSON("apps")?.apps ?? []);
+            apps.splice(appIndex, 1);
+            setCookieJSON('apps', {"apps": apps});
+            refreshDesktop();
+        } 
+    `,
 };
+
+function refreshWallpaper() {
+    const wallpaperImage = getCookie('wallpaper');
+    document.body.style.backgroundImage = `url('/wallpapers/${wallpaperImage ?? "4.png"}')`;
+}
 
 function refreshDesktop() {
     let appHTML = (name, icon) => `
     <div class="app" data-appname="${name}" onclick="clickApp(this, '${name}');">
-        <div class="icon" style="--iconURL: url('${icon}');"></div>
+        <div class="icon" style="--iconURL: url('/icons/${icon}');"></div>
         <span class="name">${name}</span>
     </div>
     `;
-    const apps = getCookieJSON("appscreator")?.apps ?? [];
-    
+    const apps = getCookieJSON("apps")?.apps ?? [];
+
+    [...appsContainer.children].forEach(ael => {
+        if (!ael.classList.contains('mainapp')) ael.remove();
+    });
     apps?.forEach(app => {
         if (![...appsContainer.children].map(a => a.getAttribute("data-appname")).includes(app.name)) {
             appsContainer.insertAdjacentHTML('beforeend', appHTML(app.name, app.icon));
@@ -217,7 +325,10 @@ function clickApp(el, name) {
         el.classList.add('clickedOnce');
     } else {
         closeAPP(name);
+        let apps = (getCookieJSON("apps")?.apps ?? []);
         setTimeout(() => {
+            let app = apps.filter(a => a.name === name)[0];
+            if (app || name === "Google") return openAPP(name, 'frame-' + (name === "Google" ? "https://google.com" : app.url));
             openAPP(name, READY_APPS[name]());
             const script = document.createElement('script');
             script.textContent = READY_APPS[name + "-script"]();
@@ -239,7 +350,7 @@ function openAPP(appName, appContent) {
                 <span class="close-app"><i class="fas fa-xmark"></i></span>
             </div>
             <div class="app-content">
-                ${appContent}
+                ${appContent.startsWith('frame') ? `<iframe src="${appContent.slice(6)}"></iframe>` : appContent}
             </div>
             <div class="resizer bottom"></div>
             <div class="resizer right"></div>
@@ -296,3 +407,12 @@ function openAPP(appName, appContent) {
     });
 
 }
+
+window.onload = () => {
+    const LoadingScreen = document.getElementById("loading");
+    setTimeout(() => {
+        if (window.innerWidth <= 700) return LoadingScreen.querySelector("h1").textContent = "This website only runs on big screens";
+        LoadingScreen.style.display = "none";
+        refreshDesktop(); refreshWallpaper();
+    }, 800);
+};
