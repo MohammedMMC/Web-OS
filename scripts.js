@@ -97,7 +97,7 @@ const READY_APPS = {
             <p class="appscreator-subtitles">Select an icon:</p>
             <div class="appscreator-selecticon">
                 ${APP_ICONS.map(icon => `
-                <div onclick="appscreator_selecticon(this, '${icon}')" data-image="${icon}" style="--iconURL: url('/icons/${icon}');"></div>
+                <div onclick="appscreator_selecticon(this, '${icon}')" data-image="${icon}" style="--iconURL: url('./icons/${icon}');"></div>
                 `).join('')}
             </div>
             <p class="appscreator-subtitles">Enter Your App Name:</p>
@@ -167,7 +167,7 @@ const READY_APPS = {
         <h3>Select a Wallpaper:</h3>
         <div class="wallpaper-select">
             ${Array.from({ length: WALLPAPERS_COUNT }, (_, index) => `
-            <div onclick="wallpaper_select(this)" data-image="${index}.png" style="--imageURL: url('/wallpapers/${index}.png');"></div>
+            <div onclick="wallpaper_select(this)" data-image="${index}.png" style="--imageURL: url('./wallpapers/${index}.png');"></div>
             `).join('')}
         </div>
         <button onclick="wallpaper_set()">Set</button>
@@ -248,7 +248,7 @@ const READY_APPS = {
         <div id="appsmanager-yourapps">
                 ${(getCookieJSON("apps")?.apps ?? []).map((app, i) => `
                     <div class="appsmanager-app">
-                        <img src="/icons/${app.icon}" width="50" height="50" />
+                        <img src="./icons/${app.icon}" width="50" height="50" />
                         <span>${app.name}</span>
                         <button onclick="appsmanager_deleteapp(this.parentNode, ${i});">Delete</button>
                     </div>
@@ -291,13 +291,13 @@ const READY_APPS = {
 
 function refreshWallpaper() {
     const wallpaperImage = getCookie('wallpaper');
-    document.body.style.backgroundImage = `url('/wallpapers/${wallpaperImage ?? "4.png"}')`;
+    document.body.style.backgroundImage = `url('./wallpapers/${wallpaperImage ?? "4.png"}')`;
 }
 
 function refreshDesktop() {
     let appHTML = (name, icon) => `
     <div class="app" data-appname="${name}" onclick="clickApp(this, '${name}');">
-        <div class="icon" style="--iconURL: url('/icons/${icon}');"></div>
+        <div class="icon" style="--iconURL: url('./icons/${icon}');"></div>
         <span class="name">${name}</span>
     </div>
     `;

@@ -17,7 +17,7 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  /* background-image: url("/wallpapers/4.png"); */
+  /* background-image: url("./wallpapers/4.png"); */
   background-color: var(--primary);
   background-position: center;
   background-repeat: no-repeat;
