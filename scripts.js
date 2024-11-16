@@ -69,7 +69,6 @@ function deleteCookie(name) {
 function getCookieJSON(name) {
     return JSON.parse(getCookie(name) ?? JSON.stringify({}));
 }
-
 function setCookieJSON(name, data) {
     return setCookie(name, JSON.stringify(data));
 }
@@ -291,7 +290,7 @@ const READY_APPS = {
 
 function refreshWallpaper() {
     const wallpaperImage = getCookie('wallpaper');
-    document.body.style.backgroundImage = `url('./wallpapers/${wallpaperImage ?? "4.png"}')`;
+    document.body.style.backgroundImage = `url("./wallpapers/${wallpaperImage ?? "4.png"}")`;
 }
 
 function refreshDesktop() {
